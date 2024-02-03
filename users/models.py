@@ -33,3 +33,20 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+    
+
+
+class APIKey(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    key = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return str(self.user) + " " + self.key
+    
+
+class SearchString(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    search = models.CharField(max_length=255)
+
+    def __str__(self):
+        return str(self.user) + " " + self.search
