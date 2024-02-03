@@ -17,9 +17,6 @@ class VideoListAPIView(APIView):
     authentication_classes = [TokenAuthentication]
 
     def get(self, request):
-        api_key = APIKey.objects.filter(user=request.user)[0].key
-        search_string = SearchString.objects.get(user=request.user).search
-        get_latest_videos(api_key, search_string, request.user)
         videos = Video.objects.filter(user=request.user)
 
         # Add pagination
