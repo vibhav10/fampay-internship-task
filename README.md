@@ -41,3 +41,8 @@ To set up and run this Django project locally, please refer to the [Setup Instru
 }
 ```
 4. Fetch videos from the Youtube API by sending a GET request to the /videos/videolist/ endpoint
+
+
+## Code Flow
+1. A celery task is scheduled to run every 10 minutes to fetch videos from the Youtube API and store them in the database.
+2. When a user sends a GET request to the /videos/videolist/ endpoint, the API fetches the videos from the database and returns them in the response.
