@@ -28,16 +28,16 @@ class CustomUserView(UserAdmin):
 
 @admin.register(APIKey)
 class APIKeyAdmin(admin.ModelAdmin):
-    list_display = ('user', 'key')
+    list_display = ('user', 'key', 'last_used')
     search_fields = ('user', 'key')
-    ordering = ('user', 'key')
+    ordering = ('user', 'key', 'last_used')
     filter_horizontal = ()
 
     fieldsets = (
-        (None, {'fields': ('user', 'key',)}),
+        (None, {'fields': ('user', 'key', 'last_used',)}),
     )   
     add_fieldsets = (
-        (None, {'fields': ('user', 'key',)}),
+        (None, {'fields': ('user', 'key', 'last_used',)}),
     )
 
     def save_related(self, request, form, formsets, change):
