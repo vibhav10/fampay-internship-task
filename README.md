@@ -26,6 +26,7 @@ To set up and run this Django project locally, please refer to the [Setup Instru
     "password": "your_password",
     "full_name": "your_name"
 }
+```
 2. Add search string to the database by sending a POST request to the /users/addsearchstring/ endpoint with the following payload:
 ```json
 {
