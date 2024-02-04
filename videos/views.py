@@ -17,7 +17,7 @@ class VideoListAPIView(APIView):
 
     def get(self, request):
         # Get videos belonging to the authenticated user
-        user_videos = Video.objects.filter(user=request.user)
+        user_videos = Video.objects.filter(user=request.user).order_by('-publishing_datetime')
 
         # Paginate the videos
         paginator = CustomPageNumberPagination()
