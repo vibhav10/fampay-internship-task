@@ -1,14 +1,12 @@
 from googleapiclient.discovery import build
-import datetime 
-from users.models import User  # Import your User model
-from django.contrib.auth.models import User
-from .models import Video  # Import your Video model
+import datetime
+from .models import Video
 from celery import shared_task
-from users.models import User, APIKey, SearchString
+from users.models import APIKey, SearchString
 from django.db import IntegrityError
 
 @shared_task
-def get_latest_videos(max_results=3):
+def get_latest_videos(max_results=15):
 
     # Get the latest search string for each user
     search_strings = SearchString.objects.all()
@@ -20,23 +18,25 @@ def get_latest_videos(max_results=3):
         for _ in range(num_keys):
             api_key = api_keys[current_key_index].key
             try:
-                youtube = build('youtube', 'v3', api_key)
                 search_query = search_string.search
-
                 youtube = build('youtube', 'v3', developerKey=api_key)
-
-                # Get the current date and time in RFC 3339 format
-                current_datetime = datetime.datetime.utcnow().isoformat() + 'Z'
+                current_datetime = datetime.datetime.utcnow()
+                target_datetime = current_datetime + datetime.timedelta(hours=2)
+                target_datetime_str = target_datetime.isoformat() + 'Z'
                 # Perform the search using the YouTube Data API
+                api_keys[current_key_index].last_used = datetime.datetime.utcnow()
+                api_keys[current_key_index].save()
                 search_response = youtube.search().list(
                     part="id,snippet",
                     q=search_query, 
                     type='video',
                     order='date',
-                    #publishedAfter=current_datetime,
+                    publishedAfter=target_datetime_str,
                     fields="items(id(videoId),snippet(title,description,publishedAt,thumbnails(default)))",
                     maxResults=max_results
                 ).execute()
+
+                print(search_response)
                 videos = []
                 existing_video_ids = set(Video.objects.filter(user=user).values_list('video_id', flat=True))
 
@@ -64,12 +64,10 @@ def get_latest_videos(max_results=3):
 
                 try:
                     Video.objects.bulk_create(videos)
-                    
-                    api_key.last_used = datetime.datetime.utcnow()
-                    api_key.save()
                     break
                 except IntegrityError as e:
                     pass
+                
             except Exception as e:
                 pass
-        current_key_index = (current_key_index + 1) % num_keys
+            current_key_index = (current_key_index + 1) % num_keys

@@ -34,10 +34,10 @@ class APIKeyAdmin(admin.ModelAdmin):
     filter_horizontal = ()
 
     fieldsets = (
-        (None, {'fields': ('user', 'key', 'last_used',)}),
+        (None, {'fields': ('user', 'key',)}),
     )   
     add_fieldsets = (
-        (None, {'fields': ('user', 'key', 'last_used',)}),
+        (None, {'fields': ('user', 'key',)}),
     )
 
     def save_related(self, request, form, formsets, change):
