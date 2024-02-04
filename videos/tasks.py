@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from .models import Video  # Import your Video model
 from celery import shared_task
 from users.models import User, APIKey, SearchString
+from django.db import IntegrityError
 
 @shared_task
 def get_latest_videos(max_results=3):
@@ -31,8 +32,15 @@ def get_latest_videos(max_results=3):
             maxResults=max_results
         ).execute()
         videos = []
+        existing_video_ids = set(Video.objects.filter(user=user).values_list('video_id', flat=True))
+
         for item in search_response.get('items', []):
             video_id = item['id']['videoId']
+
+            # Check if the video ID already exists in the database
+            if video_id in existing_video_ids:
+                continue  # Skip this video, it already exists
+
             title = item['snippet']['title']
             description = item['snippet']['description']
             publishing_datetime = item['snippet']['publishedAt']
@@ -48,4 +56,8 @@ def get_latest_videos(max_results=3):
             )
             videos.append(video)
 
-        Video.objects.bulk_create(videos)
+        try:
+            Video.objects.bulk_create(videos)
+        except IntegrityError as e:
+            # Handle integrity error, log or raise as needed
+            pass
