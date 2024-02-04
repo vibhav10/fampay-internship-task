@@ -14,6 +14,11 @@ class TokenAuthentication(BaseTokenAuthentication):
     keyword = 'Bearer'
 
 
+
+'''
+The UserLoginView class is an API view that handles user login functionality. 
+It allows users to authenticate with their email and password, and if the credentials are valid, it returns the user's information and a token.
+'''
 class UserLoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -32,6 +37,10 @@ class UserLoginView(APIView):
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+'''
+The UserCreationView class is an API view that handles the creation of a new user. It receives a POST request with user data, validates the data using the UserSerializer, 
+creates a new user if the data is valid, generates a token for the user using the Token model, and returns the user data and token key in the response.
+'''
 class UserCreationView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -49,6 +58,10 @@ class UserCreationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+'''
+The UserLogoutView class is an API view that handles user logout functionality. It requires the user to be authenticated and uses token authentication. 
+When a POST request is made to this view, the user's authentication token is deleted and a response with a status code of 200 is returned.
+'''
 class UserLogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -59,6 +72,10 @@ class UserLogoutView(APIView):
     
 
 
+
+'''
+The AddAPIKeyView is responsible for adding an API key for an authenticated user.
+'''
 class AddAPIKeyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -71,6 +88,10 @@ class AddAPIKeyView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+'''
+The RemoveAPIKeyView view allows authenticated users to remove an API key associated with their account.
+'''
 class RemoveAPIKeyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -89,6 +110,10 @@ class RemoveAPIKeyView(APIView):
             return Response({"error": "API Key not found for the user"}, status=status.HTTP_404_NOT_FOUND)
         
 
+
+'''
+The APIKeyView view allows authenticated users to view their API keys.
+'''
 class APIKeyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -103,6 +128,9 @@ class APIKeyView(APIView):
             return Response({"error": "An error occurred while fetching the API Key"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+'''
+The AddSearchStringView view allows authenticated users to add a search string to their account.
+'''
 class AddSearchStringView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -115,6 +143,9 @@ class AddSearchStringView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+'''
+The RemoveSearchStringView view allows authenticated users to remove a search string associated with their account.
+'''
 class RemoveSearchStringView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
@@ -132,6 +163,9 @@ class RemoveSearchStringView(APIView):
             return Response({"error": "An error occurred while removing the search string"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+'''
+The SearchStringView view allows authenticated users to view their search strings.
+'''
 class SearchStringView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]

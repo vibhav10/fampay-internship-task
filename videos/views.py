@@ -12,16 +12,19 @@ class CustomPageNumberPagination(PageNumberPagination):
     page_size = 10  # Set the number of items per page here
 
 class VideoListAPIView(APIView):
-
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
     def get(self, request):
-        videos = Video.objects.filter(user=request.user)
+        # Get videos belonging to the authenticated user
+        user_videos = Video.objects.filter(user=request.user)
 
-        # Add pagination
+        # Paginate the videos
         paginator = CustomPageNumberPagination()
-        paginated_videos = paginator.paginate_queryset(videos, request)
-        serializer = VideoSerializer(paginated_videos, many=True)
+        paginated_videos = paginator.paginate_queryset(user_videos, request)
+        
+        # Serialize the paginated videos
+        video_serializer = VideoSerializer(paginated_videos, many=True)
 
-        return paginator.get_paginated_response(serializer.data)
+        # Return the paginated response
+        return paginator.get_paginated_response(video_serializer.data)
